@@ -1,0 +1,123 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "name": "chaliy-play-azure-eventhubs",
+
+        "namespace_id": "[resourceId('Microsoft.EventHub/namespaces', variables('name'))]",
+
+        "authorizaiton_key_name": "[concat(variables('name'), '/RootManageSharedAccessKey')]",
+
+        "eventhub_name": "[concat(variables('name'), '/locations')]",
+        "eventhub_id": "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('name'), 'locations')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.EventHub/namespaces",
+            "name": "[variables('name')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard",
+                "capacity": 1
+            },
+            "kind": "EventHub",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "status": "Active",
+                "serviceBusEndpoint": "[concat('https://', variables('name'),'.servicebus.windows.net:443/')]",
+                "enabled": true
+            },
+            "dependsOn": [],
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "name": "[variables('authorizaiton_key_name')]",
+            "scale": null,
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[variables('namespace_id')]"
+            ],
+            "apiVersion": "2015-08-01"
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "name": "[variables('eventhub_name')]",
+            "scale": null,
+            "properties": {
+                "messageRetentionInDays": 1,
+                "status": "Active",
+                "createdAt": "2017-08-19T14:11:15.133",
+                "updatedAt": "2017-08-19T17:46:14.813",
+                "partitionCount": 2,
+                "partitionIds": [
+                    "0",
+                    "1"
+                ]
+            },
+            "dependsOn": [
+                "[variables('namespace_id')]"
+            ],
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules",
+            "name": "[concat(variables('eventhub_name'), '/Ingest')]",
+            "scale": null,
+            "properties": {
+                "rights": [
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[variables('namespace_id')]",
+                "[variables('eventhub_id')]"
+            ],
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules",
+            "name": "[concat(variables('eventhub_name'), '/Process')]",
+            "scale": null,
+            "properties": {
+                "rights": [
+                    "Listen"
+                ]
+            },
+            "dependsOn": [
+                "[variables('namespace_id')]",
+                "[variables('eventhub_id')]"
+            ],
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e0845a75-1e77-4ff1-ae74-724d9ca9b827/resourcegroups/play-azure-eventhubs/providers/Microsoft.EventHub/namespaces/chaliy-play-azure-eventhubs/eventhubs/location/consumergroups/$Default'.",
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "name": "[concat(variables('eventhub_name'), '/$default')]",
+            "scale": null,
+            "properties": {
+                "eventHubPath": "location",
+                "createdAt": "2017-08-19T14:11:21.9131171",
+                "updatedAt": "2017-08-19T14:11:21.9131171"
+            },
+            "dependsOn": [
+                "[variables('namespace_id')]",
+                "[variables('eventhub_id')]"
+            ],
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]"
+        }
+    ]
+}

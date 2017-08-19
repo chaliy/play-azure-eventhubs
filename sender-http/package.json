@@ -1,0 +1,19 @@
+{
+  "name": "chaliy-play-azure-eventhubs-sender-http",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "dotenv -e dev.env node ./index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.18.1",
+    "node-fetch": "^1.7.2"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^1.4.0"
+  }
+}
